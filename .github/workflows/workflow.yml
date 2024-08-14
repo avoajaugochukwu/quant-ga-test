@@ -44,23 +44,19 @@ jobs:
         run: |
           docker build -t hello-world .
 
-      # - name: Tag Docker image
-      #   run: |
-      #     docker tag hello-world:latest ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
-      - name: Tag Docker image
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-
         run: |
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
-          docker tag hello-world:latest $IMAGE_URI
-          echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
-          echo $IMAGE_TAG
-
-      - name: Push Docker image to ECR
-        run: |
-          docker push $IMAGE_URI
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          echo "ECR_REGISTRY=$ECR_REGISTRY"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Echo the image URI
         run: |

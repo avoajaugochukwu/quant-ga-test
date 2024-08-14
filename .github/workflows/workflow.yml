@@ -1,0 +1,61 @@
+name: Push to non-main branch
+on:
+  push:
+    branches: [main]
+      # - "main"
+# TODO: Locking mechanism to prevent multiple deployments at the same time
+# TODO: Add a way to notify the user of the deployment status
+# I created a new role, which had policy that allowed me to do this
+# I need to understand what has been done, organize the roles
+jobs:
+  build:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment: dev
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          # role-to-assume: arn:aws:iam::127350417158:role/github-terraform-oidc
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
+          aws-region: us-east-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, tag, and push docker image to Amazon ECR
+        run: echo "Hello, world!"
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: your-repo
+          IMAGE_TAG: ${{ github.sha }}
+
+      # - name: Increment value
+      #   uses: yoichiro/gh-action-increment-value@main
+      #   with:
+      #     target_directory: "."
+      #     target_file: "build_number.json"
+      #     prefix: 'buildNumber":'
+      #     suffix: "}"
+      #     commit_message: "Increment the build number to "
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Run a one-line script
+  #       run: echo Hello, world!
+
+  # notify:
+  #   runs-on: ubuntu-latest
+  #   needs: deploy
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Run a one-line script
+  #       run: echo Hello, world!

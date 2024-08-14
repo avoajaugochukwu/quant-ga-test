@@ -1,0 +1,25 @@
+# Terraform files and directories
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.idea/
+*.lock.hcl
+# Terraform logs
+.terraformrc
+terraform.rc
+.terraform/
+
+# Sensitive data
+*.pem
+*.key
+*.p12
+*.jks
+
+# apple files
+.DS_Store

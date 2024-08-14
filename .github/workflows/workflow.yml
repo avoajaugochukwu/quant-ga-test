@@ -18,22 +18,44 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          # role-to-assume: arn:aws:iam::127350417158:role/github-terraform-oidc
           role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
           aws-region: us-east-1
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      - name: Build, tag, and push docker image to Amazon ECR
-        run: echo "Hello, world!"
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: your-repo
-          IMAGE_TAG: ${{ github.sha }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t hello-world .
+
+      # - name: Tag Docker image
+      #   run: |
+      #     docker tag hello-world:latest ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
+      - name: Tag Docker image
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
+          echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
+
+      - name: Push Docker image to ECR
+        run: |
+            docker push ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
+        
+      - name: Echo the image URI
+        run: |
+          echo "Docker image has been pushed to ECR: $IMAGE_URI"
+
 
       # - name: Increment value
       #   uses: yoichiro/gh-action-increment-value@main

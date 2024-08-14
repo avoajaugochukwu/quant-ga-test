@@ -46,11 +46,12 @@ jobs:
       - name: Tag Docker image
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
+          docker tag hello-world:latest $IMAGE_URI
           echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
 
       - name: Push Docker image to ECR
         run: |
-            docker push ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
+            docker push $IMAGE_URI
         
       - name: Echo the image URI
         run: |

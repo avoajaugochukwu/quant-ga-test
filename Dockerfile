@@ -1,19 +1,30 @@
-# Use an official Golang image as the base
-FROM golang:1.20-alpine
+# Use an official Go runtime as the base image
+FROM golang:1.20-alpine AS build
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy the Go module files and download dependencies
+# Copy go.mod and go.sum files
 COPY go.mod ./
-COPY go.sum ./
+# COPY go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy the rest of the application code
+# Copy the source code into the container
 COPY . .
 
 # Build the Go app
-RUN go build -o hello-world
+RUN go build -o /hello-world
+
+# Start a new stage from scratch
+FROM alpine:latest  
+
+# Set the working directory
+WORKDIR /
+
+# Copy the pre-built binary file from the build stage
+COPY --from=build /hello-world /hello-world
 
 # Command to run the executable
-CMD ["./hello-world"]
+CMD ["/hello-world"]

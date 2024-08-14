@@ -1,7 +1,8 @@
 name: Push to non-main branch
 on:
   push:
-    branches: [main]
+    branches:
+      [main]
       # - "main"
 # TODO: Locking mechanism to prevent multiple deployments at the same time
 # TODO: Add a way to notify the user of the deployment status
@@ -35,6 +36,9 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+        # with:
+          # registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          # registry: 127350417158.dkr.ecr.us-east-1.amazonaws.com
 
       - name: Build Docker image
         run: |
@@ -44,19 +48,23 @@ jobs:
       #   run: |
       #     docker tag hello-world:latest ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
       - name: Tag Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}:latest
           docker tag hello-world:latest $IMAGE_URI
           echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
+          echo $IMAGE_TAG
 
       - name: Push Docker image to ECR
         run: |
-            docker push $IMAGE_URI
-        
+          docker push $IMAGE_URI
+
       - name: Echo the image URI
         run: |
           echo "Docker image has been pushed to ECR: $IMAGE_URI"
-
 
       # - name: Increment value
       #   uses: yoichiro/gh-action-increment-value@main

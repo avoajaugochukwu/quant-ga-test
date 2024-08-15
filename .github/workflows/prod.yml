@@ -1,20 +1,20 @@
 # This workflow will build and push a new container image to Amazon ECR
-# when code is pushed to branch that is not main branch.
-name: Deploy to dev environment
+# when code is pushed to the main branch.
+name: Deploy to prod environment
 
 env:
   ECR_REPOSITORY: quanta-test
-  ENVIRONMENT: dev
+  ENVIRONMENT: prod
 
 on:
   push:
-    branches-ignore:
+    branches:
       - 'main'
 
 jobs:
   build-tag-push:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: prod
 
     permissions:
       id-token: write

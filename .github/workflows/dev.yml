@@ -38,7 +38,7 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }}
+        IMAGE_TAG: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.ENVIRONMENT }}-${{ github.sha }}
       run: |
         # Build a docker container and
         # push it to ECR so that it can

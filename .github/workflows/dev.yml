@@ -1,0 +1,48 @@
+# This workflow will build and push a new container image to Amazon ECR
+# when code is pushed to branch that is not main branch.
+name: Deploy to Dev Environment
+
+env:
+  ECR_REPOSITORY: quanta-test
+  ENVIRONMENT: dev
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build-tag-push:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS
+        docker build -t ${{ github.sha }}-${{ env.ECR_REPOSITORY }} .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY/${{ github.sha }}-${{ env.ECR_REPOSITORY }}
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY/${{ github.sha }}-${{ env.ECR_REPOSITORY }}" >> $GITHUB_OUTPUT

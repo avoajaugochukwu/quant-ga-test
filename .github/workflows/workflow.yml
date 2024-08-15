@@ -13,8 +13,8 @@ env:
 on:
   push:
     branches:
-      [main]
-      # - "main"
+      # [main]
+      - "main"
 # TODO: Locking mechanism to prevent multiple deployments at the same time
 # TODO: Add a way to notify the user of the deployment status
 

@@ -8,7 +8,7 @@ env:
 
 on:
   push:
-    branches:
+    branches-ignore:
       - 'main'
 
 jobs:
@@ -45,3 +45,4 @@ jobs:
         # be deployed to ECS
         docker build -t $IMAGE_TAG .
         docker push $IMAGE_TAG
+        echo "IMAGE_TAG=$IMAGE_TAG"

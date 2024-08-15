@@ -1,7 +1,7 @@
 name: Push to non-main branch
 
 env:
-  AWS_REGION: MY_AWS_REGION                    # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: MY_AWS_REGION                    # set this to your preferred AWS region
   ECR_REPOSITORY: quanta-test                  # set this to your Amazon ECR repository name
   ECS_SERVICE: MY_ECS_SERVICE                  # set this to your Amazon ECS service name
   ECS_CLUSTER: MY_ECS_CLUSTER                  # set this to your Amazon ECS cluster name
@@ -12,9 +12,8 @@ env:
 # ----------------------------
 on:
   push:
-    branches:
-      # [main]
-      - "main"
+    branches: [main]
+      # - "main"
 # TODO: Locking mechanism to prevent multiple deployments at the same time
 # TODO: Add a way to notify the user of the deployment status
 

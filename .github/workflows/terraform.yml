@@ -53,8 +53,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: 1
-          title: 'Approve Terraform Apply for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}'
-          body: 'Approve the apply of the planned changes for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }} workspace.'
+          # title: 'Approve Terraform Apply for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}'
+          # body: 'Approve the apply of the planned changes for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }} workspace.'
 
       - name: Terraform Apply
         if: ${{ steps.approval.outputs.approval_result == 'approve' }}

@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }} # Ensures the correct branch is checked out
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2

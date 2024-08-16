@@ -5,9 +5,10 @@ on:
     branches:
       - preprod
       - prod
+      - main
     paths:
       - '**/*.tf'
-      - '*.tf'
+      # - '*.tf'
 
 jobs:
   terraform:

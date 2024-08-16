@@ -54,6 +54,11 @@ jobs:
         with:
           name: tfplan
           path: tfplan
+      - name: Upload Lock File
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-lock
+          path: .terraform.lock.hcl
 
   terraform-apply:
     name: Terraform Apply
@@ -92,6 +97,11 @@ jobs:
 
       - name: Select Terraform Workspace
         run: terraform workspace select ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}
+      
+      - name: Download Lock File
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-lock
 
       - name: Terraform Apply
         run: terraform apply tfplan

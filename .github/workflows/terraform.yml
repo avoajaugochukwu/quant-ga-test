@@ -39,9 +39,10 @@ jobs:
         run: terraform plan -var-file=${{ github.ref_name }}.tfvars -out=tfplan
 
       - name: Request Manual Approval
-        uses: flyway/approve-pull-request-action@v1.0
+        uses: juliangruber/approve-pull-request-action@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: 1
           title: 'Approve Terraform Apply for ${{ github.ref_name }}'
           body: 'Approve the apply of the planned changes for ${{ github.ref_name }} workspace.'
 

@@ -85,6 +85,11 @@ jobs:
         with:
           terraform_version: 1.5.0
 
+      - name: Ensure Terraform Workspace Exists
+        run: |
+          terraform workspace list | grep -q "${{ github.ref_name == 'main' && 'prod' || 'preprod' }}" \
+          || terraform workspace new ${{ github.ref_name == 'main' && 'prod' || 'preprod' }} 
+
       - name: Select Terraform Workspace
         run: terraform workspace select ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}
 

@@ -8,10 +8,11 @@ on:
       - test-pr-a
     paths:
       - '**/*.tf'
+  workflow_dispatch:
 
 jobs:
-  terraform:
-    name: Terraform Apply
+  terraform-plan:
+    name: Terraform Plan
     runs-on: ubuntu-latest
 
     permissions:
@@ -48,16 +49,46 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=${{ github.ref_name == 'main' && 'prod' || 'preprod' }}.tfvars -out=tfplan
 
-      - name: Request Manual Approval
-        uses: juliangruber/approve-pull-request-action@v2
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          number: 1
-          # title: 'Approve Terraform Apply for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}'
-          # body: 'Approve the apply of the planned changes for ${{ github.ref_name == 'main' && 'prod' || 'preprod' }} workspace.'
+          name: tfplan
+          path: tfplan
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.event_name == 'workflow_dispatch'
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
+          aws-region: us-east-1
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: tfplan
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Select Terraform Workspace
+        run: terraform workspace select ${{ github.ref_name == 'main' && 'prod' || 'preprod' }}
 
       - name: Terraform Apply
-        if: ${{ steps.approval.outputs.approval_result == 'approve' }}
         run: terraform apply tfplan
 
       - name: Clean up

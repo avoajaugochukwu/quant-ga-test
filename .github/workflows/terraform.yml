@@ -42,8 +42,8 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Terraform Init with Upgrade
+        run: terraform init -upgrade
 
       - name: Ensure Terraform Workspace Exists
         run: |
@@ -52,9 +52,6 @@ jobs:
 
       - name: Select Terraform Workspace
         run: terraform workspace select ${{ github.event.inputs.environment }}
-
-      - name: Terraform Init with Upgrade
-        run: terraform init -upgrade
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{ github.event.inputs.environment }}.tfvars -out=tfplan

@@ -42,6 +42,9 @@ jobs:
         with:
           terraform_version: 1.5.0
 
+      - name: Terraform Init
+        run: terraform init
+
       - name: Ensure Terraform Workspace Exists
         run: |
           terraform workspace list | grep -q "${{ github.event.inputs.environment }}" \

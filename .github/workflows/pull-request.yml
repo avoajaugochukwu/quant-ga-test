@@ -7,8 +7,11 @@ env:
   ENVIRONMENT: stg
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - xxxxxx
+  # pull_request: # working
+  # types: [opened, synchronize, reopened] # working
 
 jobs:
   build-tag-push:

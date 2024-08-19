@@ -8,8 +8,10 @@ env:
 
 on:
   push:
-    branches-ignore:
-      - 'main'
+    branches:
+      - xxxxxx
+    # branches-ignore: # working
+    #   - 'main' # working
 
 jobs:
   build-tag-push:

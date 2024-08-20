@@ -43,15 +43,21 @@ jobs:
         run: |
           terraform show -no-color tfplan > plan.txt
           cat plan.txt
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+      
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
         with:
-          branch: ${{ env.BRANCH_NAME }}
-          base: main
-          title: Terraform Plan for ${{ env.BRANCH_NAME }}"
-          body: |
+          message: |
             This PR contains the Terraform plan for the changes in .tf files.
-            ```
-            ${{ steps.add-plan.outputs.stdout }}
-            ```
+            ```${{ steps.add-plan.outputs.stdout }}```
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     branch: ${{ env.BRANCH_NAME }}
+      #     base: main
+      #     title: Terraform Plan for ${{ env.BRANCH_NAME }}"
+      #     body: |
+      #       This PR contains the Terraform plan for the changes in .tf files.
+      #       ```
+      #       ${{ steps.add-plan.outputs.stdout }}
+      #       ```

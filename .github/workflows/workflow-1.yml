@@ -12,6 +12,7 @@ jobs:
     permissions:
       id-token: write
       contents: write  # Ensure write access to create a PR
+      pull-requests: write
 
     steps:
       - name: Checkout repository

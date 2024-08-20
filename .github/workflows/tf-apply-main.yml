@@ -35,6 +35,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+      
+      - name: Terraform list Workspace
+        run: terraform workspace list
 
       - name: Check if prod workspace exists and create/select it
         run: |

@@ -1,0 +1,60 @@
+name: Create PR with Terraform Plan
+
+on:
+  push:
+    # branches:
+    #   - main
+    paths:
+      - '**/*.tf'
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create new branch
+        id: create-branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          BRANCH_NAME="tf-plan-$(date +%s)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out=tfplan
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Terraform Plan for ${BRANCH_NAME}"
+          body: |
+            This PR contains the Terraform plan for the changes in .tf files.
+            ```
+            ${{ steps.plan.outputs.stdout }}
+            ```
+
+      - name: Add Comment to PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const plan = steps.plan.outputs.stdout;
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: prNumber,
+              body: `Terraform Plan:\n\`\`\`${plan}\`\`\``
+            });

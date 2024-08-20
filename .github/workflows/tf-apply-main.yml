@@ -2,6 +2,8 @@ name: Terraform Apply Main Branch
 
 on:
   push:
+    branches: # remove this line
+      - xxxx # remove this line
     # branches-ignore:
     #   - main
     # paths:

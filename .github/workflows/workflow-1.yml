@@ -1,0 +1,73 @@
+name: Create PR with Terraform Plan
+
+on:
+  push:
+    paths:
+      - '**/*.tf'
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write  # Ensure write access to create a PR
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}  # Use a PAT with repo scope
+
+      - name: Create new branch
+        id: create-branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          BRANCH_NAME="tf-plan-$(date +%s)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out=tfplan
+
+      - name: Add Terraform Plan to PR
+        id: add-plan
+        run: |
+          terraform show -no-color tfplan > plan.txt
+          cat plan.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git add .  # Add all changes
+          git commit -m "Add Terraform plan for changes"
+          git push origin ${{ env.BRANCH_NAME }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          title: Terraform Plan for ${{ env.BRANCH_NAME }}"
+          body: |
+            This PR contains the Terraform plan for the changes in .tf files.
+            ```
+            ${{ steps.plan.outputs.stdout }}
+            ```

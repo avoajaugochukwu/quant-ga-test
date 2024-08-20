@@ -2,24 +2,27 @@ name: Terraform Apply Non-Main Branch
 
 on:
   push:
-    branches-ignore:
-      - main
-    paths:
-      - '**/*.tf'
+    branches: # remove this line
+      - xxxxx # remove this line
+    # branches-ignore:
+    #   - main
+    # paths:
+    #   - '**/*.tf'
 
 jobs:
   terraform-apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
 
-    # permissions:
-    #   id-token: write
-    #   contents: read
-    #   pull-requests: write
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }} 
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2

@@ -38,7 +38,7 @@ jobs:
 
       - name: Check if prod workspace exists and create/select it
         run: |
-          if terraform workspace list | grep -q "prod"; then
+          if terraform workspace list | grep -qw "prod"; then
             echo "Workspace 'prod' exists. Selecting it."
             terraform workspace select prod
           else

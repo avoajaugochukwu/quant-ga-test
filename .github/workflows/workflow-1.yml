@@ -48,14 +48,17 @@ jobs:
         id: plan
         run: terraform plan -out=tfplan
 
-      - name: Strip ANSI codes from plan output
-        id: strip-ansi
+      - name: Add Terraform Plan to PR
+        id: add-plan
         run: |
-          # Remove ANSI escape codes from the Terraform plan
-          sed 's/\x1b\[[0-9;]*m//g' plan.txt > clean_plan.txt
-          # Output the cleaned plan to check
-          cat clean_plan.txt
-        continue-on-error: true
+          terraform show -no-color tfplan > plan.txt
+          cat plan.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git add .  # Add all changes
+          git commit -m "Add Terraform plan for changes"
+          git push origin ${{ env.BRANCH_NAME }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
@@ -68,15 +71,3 @@ jobs:
             ```
             ${{ steps.plan.outputs.stdout }}
             ```
-
-      # - name: Add Comment to PR
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       const prNumber = context.payload.pull_request.number;
-      #       const plan = steps.plan.outputs.stdout;
-      #       github.rest.issues.createComment({
-      #         ...context.repo,
-      #         issue_number: prNumber,
-      #         body: `Terraform Plan:\n\`\`\`${plan}\`\`\``
-      #       });

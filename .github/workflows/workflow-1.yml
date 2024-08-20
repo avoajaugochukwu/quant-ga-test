@@ -28,7 +28,7 @@ jobs:
           git push origin $BRANCH_NAME
       
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
           aws-region: us-east-1

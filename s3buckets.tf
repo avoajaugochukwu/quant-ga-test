@@ -1,6 +1,6 @@
 # Create a bucket with a name that includes the current timestamp
 resource "aws_s3_bucket" "bucket" {
-  bucket = "tf-bucket-${timestamp()}"  # Replace "my-bucket" with your desired prefix
+  bucket = "tf-bucket-${formatdate("DD MMM YYYY hh-mm", timestamp())}"  # Replace "my-bucket" with your desired prefix
 }
 
 # Output the bucket name

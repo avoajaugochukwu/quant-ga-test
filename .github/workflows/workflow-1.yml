@@ -1,7 +1,7 @@
 name: Create PR with Terraform Plan
 
 on:
-  push:
+  pull_request:
     paths:
       - '**/*.tf'
 
@@ -19,16 +19,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}  # Use a PAT with repo scope
-
-      - name: Create new branch
-        id: create-branch
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          BRANCH_NAME="tf-plan-$(date +%s)"
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          git checkout -b $BRANCH_NAME
-          git push origin $BRANCH_NAME
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -53,21 +43,21 @@ jobs:
         run: |
           terraform show -no-color tfplan > plan.txt
           cat plan.txt
-
-      - name: Commit and Push Changes
-        run: |
-          git add .  # Add all changes
-          git commit -m "Add Terraform plan for changes"
-          git push origin ${{ env.BRANCH_NAME }}
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+      
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
         with:
-          branch: ${{ env.BRANCH_NAME }}
-          base: main
-          title: Terraform Plan for ${{ env.BRANCH_NAME }}"
-          body: |
+          message: |
             This PR contains the Terraform plan for the changes in .tf files.
-            ```
-            ${{ steps.plan.outputs.stdout }}
-            ```
+            ```${{ steps.add-plan.outputs.stdout }}```
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     branch: ${{ env.BRANCH_NAME }}
+      #     base: main
+      #     title: Terraform Plan for ${{ env.BRANCH_NAME }}"
+      #     body: |
+      #       This PR contains the Terraform plan for the changes in .tf files.
+      #       ```
+      #       ${{ steps.add-plan.outputs.stdout }}
+      #       ```

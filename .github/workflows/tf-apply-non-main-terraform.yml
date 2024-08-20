@@ -2,10 +2,10 @@ name: Terraform Apply Non-Main Branch
 
 on:
   push:
-    branches-ignore:
-      - main
-    paths:
-      - '**/*.tf'
+    # branches-ignore:
+    #   - main
+    # paths:
+    #   - '**/*.tf'
 
 jobs:
   terraform-apply:

@@ -15,12 +15,13 @@ jobs:
       id-token: write
       contents: read
 
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          # ref: ${{ github.ref }}
+          ref: main  # Ensures you start from the main branch
           token: ${{ secrets.GH_PAT }}
 
       - name: Create new branch
@@ -55,6 +56,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           branch: ${{ env.BRANCH_NAME }}
+          base: main  # Specify the base branch for the PR
           title: "Terraform Plan for ${BRANCH_NAME}"
           body: |
             This PR contains the Terraform plan for the changes in .tf files.
@@ -63,6 +65,7 @@ jobs:
             ```
 
       - name: Add Comment to PR
+        if: success() && steps.create-branch.outputs.BRANCH_NAME != ''  # Ensures this step only runs if the previous ones succeed
         uses: actions/github-script@v6
         with:
           script: |

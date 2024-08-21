@@ -11,14 +11,14 @@ jobs:
 
     permissions:
       id-token: write
-      contents: write  # Ensure write access to create a PR
+      contents: write
       pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_PAT }}  # Use a PAT with repo scope
+          token: ${{ secrets.GH_PAT }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -34,11 +34,14 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Select prod Workspace
+        run: terraform workspace new prod
+
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -var-file=prod.tfvars -out=tfplan
 
-      - name: Add Terraform Plan to PR
+      - name: Add Terraform Plan to Standard Output
         id: add-plan
         run: |
           terraform show -no-color tfplan > plan.txt

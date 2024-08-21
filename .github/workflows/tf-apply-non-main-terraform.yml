@@ -36,15 +36,8 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Check if preprod workspace exists and create/select it
-        run: |
-          if terraform workspace list | grep -q "preprod"; then
-            echo "Workspace 'preprod' exists. Selecting it."
-            terraform workspace select preprod
-          else
-            echo "Workspace 'preprod' does not exist. Creating it."
-            terraform workspace new preprod
-          fi
+      - name: Select preprod Workspace
+        run: terraform workspace new preprod
       
       - name: Terraform Plan
         run: terraform plan -var-file=preprod.tfvars -out=tfplan

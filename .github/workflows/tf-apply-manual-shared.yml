@@ -1,14 +1,14 @@
-name: Shared PR Close Triggered Terraform Apply
+name: Shared Manual Triggered Terraform Apply
 
 on:
   workflow_call:
     inputs:
       workspace:
-        description: 'The Terraform workspace to use'
+        description: 'The Terraform workspace to use (e.g., preprod or prod)'
         type: string
         required: true
       var-file:
-        description: 'The Terraform variable file to use'
+        description: 'The Terraform variable file to use (e.g., preprod.tfvars or prod.tfvars)'
         type: string
         required: true
 
@@ -27,7 +27,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role-role
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
           aws-region: us-east-1
 
       - name: Set up Terraform
@@ -39,7 +39,7 @@ jobs:
         run: terraform init
 
       - name: Select Workspace
-        run: terraform workspace select ${{ inputs.workspace }}
+        run: terraform workspace select ${{ inputs.workspace }} || terraform workspace new ${{ inputs.workspace }}
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{ inputs.var-file }} -out=tfplan

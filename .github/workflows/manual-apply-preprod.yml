@@ -1,0 +1,11 @@
+name: Manual Apply Terraform to Preprod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apply-preprod:
+    uses: ./.github/workflows/tf-apply-manual-shared.yml
+    with:
+      workspace: preprod
+      var-file: preprod.tfvars

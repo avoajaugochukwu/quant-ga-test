@@ -68,9 +68,9 @@
 # }
 
 
-# module "github_oidc_role" {
-#   source      = "./modules/github_oidc_role"  # Update the path if the module is stored elsewhere
-#   role_name   = "github_oidc_role"
-#   policy_name = "ci-deploy-policy"
-#   repository  = "repo:avoajaugochukwu/quant-ga-test:*"
-# }
+module "github_oidc_role" {
+  source      = "./modules/github_oidc_role"  # Update the path if the module is stored elsewhere
+  role_name   = "github_oidc_role"
+  policy_name = "ci-deploy-policy"
+  repository  = "repo:avoajaugochukwu/*"
+}

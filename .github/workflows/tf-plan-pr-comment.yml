@@ -1,0 +1,62 @@
+# This workflow will create a PR comment with the Terraform plan when a PR is created or updated
+name: Create PR with Terraform Plan
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.tf'
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    
+    strategy:
+      matrix:
+        workspace: [prod, preprod]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role-role
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Select prod Workspace
+        run: terraform workspace select ${{ matrix.workspace }}
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var-file=${{ matrix.workspace }}.tfvars -out=tfplan
+
+      - name: Add Terraform Plan to Standard Output
+        id: add-plan
+        run: |
+          terraform show -no-color tfplan > plan.txt
+          cat plan.txt
+      
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            This PR contains the Terraform plan for `${{ matrix.workspace }}` workspace.
+            ```${{ steps.add-plan.outputs.stdout }}```

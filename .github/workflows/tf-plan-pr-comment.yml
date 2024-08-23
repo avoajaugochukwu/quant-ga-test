@@ -1,7 +1,10 @@
+# This workflow will create a PR comment with the Terraform plan when a PR is created or updated
 name: Create PR with Terraform Plan
 
 on:
   pull_request:
+    branches:
+      - main
     paths:
       - '**/*.tf'
 
@@ -13,6 +16,10 @@ jobs:
       id-token: write
       contents: write
       pull-requests: write
+    
+    strategy:
+      matrix:
+        workspace: [prod, preprod]
 
     steps:
       - name: Checkout repository
@@ -39,7 +46,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var-file=prod.tfvars -out=tfplan
+        run: terraform plan -var-file=${{ matrix.workspace }} -out=tfplan
 
       - name: Add Terraform Plan to Standard Output
         id: add-plan
@@ -51,5 +58,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            This PR contains the Terraform plan for the changes in .tf files.
+            This PR contains the Terraform plan for `${{ matrix.workspace }}` workspace.
             ```${{ steps.add-plan.outputs.stdout }}```

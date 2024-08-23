@@ -1,5 +1,5 @@
 # This workflow will create a PR comment with the Terraform plan when a PR is created or updated
-name: Create PR with Terraform Plan
+name: Add Preprod & Prod Terraform Plan as PR Comment when PR is created or updated
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - '**/*.tf'
 
 jobs:
-  create-pr:
+  add-comment:
     runs-on: ubuntu-latest
 
     permissions:

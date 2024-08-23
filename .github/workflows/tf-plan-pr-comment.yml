@@ -46,7 +46,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var-file=${{ matrix.workspace }} -out=tfplan
+        run: terraform plan -var-file=${{ matrix.workspace }}.tfvars -out=tfplan
 
       - name: Add Terraform Plan to Standard Output
         id: add-plan

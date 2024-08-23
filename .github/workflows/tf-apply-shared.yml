@@ -1,32 +1,33 @@
-# This workflow will apply terraform changes to the preprod environment when a non-main branch is pushed
-name: Terraform Apply Non-Main Branch
+name: Reusable Terraform Apply
 
 on:
-  push:
-    branches-ignore:
-      - main
-    paths:
-      - '**/*.tf'
+  workflow_call:
+    inputs:
+      workspace:
+        description: 'The Terraform workspace to use'
+        type: string
+        required: true
+      var-file:
+        description: 'The Terraform variable file to use'
+        type: string
+        required: true
 
 jobs:
   terraform-apply:
-    name: Terraform Apply
     runs-on: ubuntu-latest
 
     permissions:
       id-token: write
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }} 
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role-role
+          role-to-assume: arn:aws:iam::127350417158:role/github_oidc_role
           aws-region: us-east-1
 
       - name: Set up Terraform
@@ -37,11 +38,11 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Select preprod Workspace
-        run: terraform workspace select preprod
-      
+      - name: Select Workspace
+        run: terraform workspace select ${{ inputs.workspace }}
+
       - name: Terraform Plan
-        run: terraform plan -var-file=preprod.tfvars -out=tfplan
+        run: terraform plan -var-file=${{ inputs.var-file }} -out=tfplan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan

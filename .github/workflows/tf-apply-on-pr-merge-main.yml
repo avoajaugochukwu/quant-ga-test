@@ -18,6 +18,7 @@ jobs:
   
   apply-prod:
     if: github.event.pull_request.merged == true
+    needs: apply-preprod
     uses: ./.github/workflows/tf-apply-shared.yml
     with:
       workspace: prod

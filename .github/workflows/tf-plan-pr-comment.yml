@@ -42,7 +42,7 @@ jobs:
         run: terraform init
 
       - name: Select prod Workspace
-        run: terraform workspace new prod
+        run: terraform workspace select ${{ matrix.workspace }}
 
       - name: Terraform Plan
         id: plan

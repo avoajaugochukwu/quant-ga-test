@@ -1,5 +1,5 @@
 # This workflow will create a PR comment with the Terraform plan when a PR is created or updated
-name: Add Preprod & Prod Terraform Plan as PR Comment when PR is created or updated
+name: On PR create - add tf plan comment
 
 on:
   pull_request:

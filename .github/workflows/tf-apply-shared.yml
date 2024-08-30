@@ -52,7 +52,7 @@ jobs:
         working-directory: ${{ inputs.stack }}
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{ inputs.var-file }} -out=tfplan
+        run: terraform plan -var-file=../${{ inputs.var-file }} -out=tfplan
         working-directory: ${{ inputs.stack }}
 
       - name: Terraform Apply

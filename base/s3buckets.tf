@@ -1,6 +1,6 @@
 # Create a bucket with a name that includes the current timestamp
 locals {
-  bucket_count = 3  # Number of buckets you want to create
+  bucket_count = 4  # Number of buckets you want to create
 }
 
 resource "aws_s3_bucket" "bucket" {

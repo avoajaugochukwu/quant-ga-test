@@ -45,12 +45,16 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ${{ inputs.stack }}
 
       - name: Select Workspace
         run: terraform workspace select ${{ inputs.workspace }}
+        working-directory: ${{ inputs.stack }}
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{ inputs.var-file }} -out=tfplan
+        working-directory: ${{ inputs.stack }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        working-directory: ${{ inputs.stack }}

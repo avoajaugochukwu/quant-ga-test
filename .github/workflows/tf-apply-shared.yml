@@ -39,11 +39,9 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Change to Terraform directory
-        run: cd ${{ inputs.stack }}
-
       - name: List files in Terraform directory
         run: ls -la
+        working-directory: ${{ inputs.stack }}
 
       - name: Terraform Init
         run: terraform init

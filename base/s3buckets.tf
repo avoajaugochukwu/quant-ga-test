@@ -6,7 +6,7 @@ locals {
 resource "aws_s3_bucket" "bucket" {
   count = local.bucket_count
 
-  bucket = "tf-bucket-${formatdate("YYYYMMDD-HHMM", timestamp())}-${count.index}"
+  bucket = "tf-bucket-${terraform.workspace}-${formatdate("YYYYMMDD-HHMM", timestamp())}-${count.index}"
 }
 
 output "bucket_names" {

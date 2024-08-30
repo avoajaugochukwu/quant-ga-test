@@ -15,6 +15,7 @@ jobs:
       workspace: preprod
       var-file: preprod.tfvars
       stack: base
+
   apply-preprod-eks-bootstrap:
     uses: ./.github/workflows/tf-apply-shared.yml
     with:

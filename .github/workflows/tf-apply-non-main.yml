@@ -1,0 +1,16 @@
+# This workflow will apply terraform changes to the preprod environment when a non-main branch is pushed
+name: Terraform Apply Non-Main Branch
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - '**/*.tf'
+
+jobs:
+  apply-preprod:
+    uses: ./.github/workflows/tf-apply-shared.yml
+    with:
+      workspace: preprod
+      var-file: preprod.tfvars
